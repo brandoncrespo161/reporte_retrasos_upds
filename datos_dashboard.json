@@ -1,16 +1,5 @@
 [
     {
-        "Docente": "CRISTHIAN RUSSEL VASQUEZ TORRICO",
-        "Modulo": "2-I-2026",
-        "Materia": "Liderazgo y Comunicación Efectiva",
-        "Mes": "Marzo",
-        "Modalidad": "PRESENCIAL",
-        "Turno": "MEDIO DIA",
-        "Minutos_Totales": 145,
-        "Faltas": 12,
-        "Tiempo_Formateado": "2h 25m"
-    },
-    {
         "Docente": "OMAR DIEGO MUJICA CHOQUE",
         "Modulo": "1-I-2026",
         "Materia": "Medicina Legal",
@@ -110,6 +99,17 @@
         "Tiempo_Formateado": "1h 8m"
     },
     {
+        "Docente": "CRISTHIAN FABIAN GARCIA IBAÑEZ",
+        "Modulo": "1-I-2026",
+        "Materia": "Gestión del Mantenimiento",
+        "Mes": "Febrero",
+        "Modalidad": "PRESENCIAL",
+        "Turno": "MAÑANA",
+        "Minutos_Totales": 68,
+        "Faltas": 11,
+        "Tiempo_Formateado": "1h 8m"
+    },
+    {
         "Docente": "RENE ZURITA LOPEZ",
         "Modulo": "1-I-2026",
         "Materia": "Simulación Matemática de Yacimientos",
@@ -121,15 +121,15 @@
         "Tiempo_Formateado": "1h 8m"
     },
     {
-        "Docente": "CRISTHIAN FABIAN GARCIA IBAÑEZ",
+        "Docente": "MIRIAN BELEN SOTELO TINTAYA",
         "Modulo": "1-I-2026",
-        "Materia": "Gestión del Mantenimiento",
+        "Materia": "Metodología de la Investigación Científica",
         "Mes": "Febrero",
         "Modalidad": "PRESENCIAL",
         "Turno": "MAÑANA",
-        "Minutos_Totales": 68,
-        "Faltas": 11,
-        "Tiempo_Formateado": "1h 8m"
+        "Minutos_Totales": 67,
+        "Faltas": 12,
+        "Tiempo_Formateado": "1h 7m"
     },
     {
         "Docente": "CARMEN GABRIELA QUISPE MARTINEZ",
@@ -143,15 +143,15 @@
         "Tiempo_Formateado": "1h 7m"
     },
     {
-        "Docente": "MIRIAN BELEN SOTELO TINTAYA",
-        "Modulo": "1-I-2026",
-        "Materia": "Metodología de la Investigación Científica",
-        "Mes": "Febrero",
+        "Docente": "CRISTHIAN RUSSEL VASQUEZ TORRICO",
+        "Modulo": "2-I-2026",
+        "Materia": "Liderazgo y Comunicación Efectiva",
+        "Mes": "Marzo",
         "Modalidad": "PRESENCIAL",
-        "Turno": "MAÑANA",
-        "Minutos_Totales": 67,
-        "Faltas": 12,
-        "Tiempo_Formateado": "1h 7m"
+        "Turno": "MEDIO DIA",
+        "Minutos_Totales": 65,
+        "Faltas": 11,
+        "Tiempo_Formateado": "1h 5m"
     },
     {
         "Docente": "JULIO CESAR PLATA GALARZA",
