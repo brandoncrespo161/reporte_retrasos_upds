@@ -18,19 +18,26 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Open Sans', sans-serif; background-color: var(--bg-color); color: var(--text-dark); display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* Cabecera */
         .header { background: var(--primary); color: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
         .header h1 { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800; }
         .header-badge { background: rgba(255, 255, 255, 0.15); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid rgba(255,255,255,0.3); }
         
-        .container { max-width: 1450px; margin: 20px auto; padding: 0 15px; width: 100%; display: flex; flex-direction: column; gap: 15px; animation: fadeIn 0.4s ease-out;}
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .container { max-width: 1450px; margin: 15px auto; padding: 0 15px; width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        
+        /* Pestañas */
+        .tabs-nav { display: flex; gap: 10px; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 5px;}
+        .tab-btn { background: none; border: none; padding: 10px 20px; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .tab-btn:hover { background: #e2e8f0; color: var(--text-dark); }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 3px 5px rgba(49,66,132,0.3); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Componentes Base */
+        /* Tarjetas Comunes */
         .card-panel { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
         .section-title { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 800; color: var(--primary); margin-bottom: 15px; display:flex; align-items:center; gap:8px; border-bottom: 1px solid var(--border); padding-bottom: 8px;}
 
-        /* Filtros */
+        /* Filtros y Botones */
         .filters { display: flex; gap: 15px; background: #ffffff; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.02); flex-wrap: wrap; align-items: flex-end;}
         .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 180px; }
         .filter-group label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
@@ -50,11 +57,16 @@
         .kpi-value { font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 800; color: var(--text-dark); position: relative; z-index: 2;}
         .kpi-card.danger .kpi-value { color: var(--danger); }
 
-        /* Gráficos */
+        /* GRID GERENCIAL DE GRÁFICOS */
         .charts-dashboard { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 15px; transition: all 0.3s ease-in-out; }
         .chart-wrapper { position: relative; width: 100%; height: 240px; }
 
-        /* Tabla */
+        /* Contenedor Power BI */
+        .pbi-container { width: 100%; height: 80vh; min-height: 600px; border-radius: 8px; overflow: hidden; background: #e2e8f0; border: 1px dashed #cbd5e1; position: relative;}
+        .pbi-container iframe { width: 100%; height: 100%; border: none; position: relative; z-index: 10;}
+        .pbi-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-muted); z-index: 1;}
+
+        /* Tabla Estilos */
         .table-responsive { overflow-y: auto; max-height: 500px; border-radius: 6px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; text-align: left; }
         thead { background: var(--primary); color: white; font-family: 'Montserrat', sans-serif; position: sticky; top: 0; z-index: 10;}
@@ -86,98 +98,135 @@
                 <div style="font-size: 11px; font-weight: 400; opacity: 0.9; margin-top: 2px;">Universidad Privada Domingo Savio - Sede Cochabamba</div>
             </div>
         </div>
-        <div class="header-badge"><i class="fa-solid fa-lock"></i> Informe General</div>
+        <div class="header-badge"><i class="fa-solid fa-lock"></i> Informe Gerencial Rectorado</div>
     </div>
     
     <div class="container">
         
-        <!-- BARRA DE FILTROS + BOTÓN OCULTAR GRÁFICOS -->
-        <div class="filters">
-            <div class="filter-group">
-                <label>Buscar Docente / Materia</label>
-                <input type="text" id="fTexto" placeholder="Ej. Perez..." oninput="filtrarGlobal()">
+        <!-- NAVEGACIÓN DE PESTAÑAS -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="abrirPestana('tab-retrasos', this)"><i class="fa-solid fa-stopwatch"></i> Control de Retrasos</button>
+            <button class="tab-btn" onclick="abrirPestana('tab-powerbi', this)"><i class="fa-solid fa-chart-pie"></i> Reporte Integral Power BI</button>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- PESTAÑA 1: DASHBOARD GERENCIAL DE RETRASOS -->
+        <!-- ============================================== -->
+        <div id="tab-retrasos" class="tab-content active">
+            
+            <!-- BARRA DE FILTROS + BOTÓN OCULTAR GRÁFICOS -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Buscar Docente / Materia</label>
+                    <input type="text" id="fTexto" placeholder="Ej. Perez..." oninput="filtrarGlobal()">
+                </div>
+                <div class="filter-group">
+                    <label>Módulo / Mes</label>
+                    <select id="fMes" onchange="filtrarGlobal()">
+                        <option value="Todos">Todos (Ene - Mar)</option>
+                        <option value="Enero">Enero (Módulo 6-II-2026)</option>
+                        <option value="Febrero">Febrero (Módulo 1-I-2026)</option>
+                        <option value="Marzo">Marzo (Módulo 2-I-2026)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sistema Académico</label>
+                    <select id="fMod" onchange="filtrarGlobal()">
+                        <option value="Todas">Ambos Sistemas</option>
+                        <option value="PRESENCIAL / SEMANAL">Sistema Presencial</option>
+                        <option value="SEMIPRESENCIAL">Sistema Semipresencial</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="min-width: auto; flex: 0 0 auto;">
+                    <button id="btnToggle" class="btn-toggle" onclick="toggleGraficos()">
+                        <i class="fa-solid fa-eye-slash"></i> Ocultar Gráficos
+                    </button>
+                </div>
             </div>
-            <div class="filter-group">
-                <label>Módulo / Mes</label>
-                <select id="fMes" onchange="filtrarGlobal()">
-                    <option value="Todos">Todos (Ene - Mar)</option>
-                    <option value="Enero">Enero (Módulo 6-II-2026)</option>
-                    <option value="Febrero">Febrero (Módulo 1-I-2026)</option>
-                    <option value="Marzo">Marzo (Módulo 2-I-2026)</option>
-                </select>
+
+            <!-- KPIs -->
+            <div class="kpi-row">
+                <div class="kpi-card danger">
+                    <i class="fa-solid fa-clock kpi-icon"></i>
+                    <div class="kpi-title">Tiempo Total Perdido</div>
+                    <div class="kpi-value" id="kpiHoras">0h 0m</div>
+                </div>
+                <div class="kpi-card warning">
+                    <i class="fa-solid fa-triangle-exclamation kpi-icon"></i>
+                    <div class="kpi-title">Total de Faltas/Atrasos</div>
+                    <div class="kpi-value" id="kpiFrecuencia">0</div>
+                </div>
+                <div class="kpi-card">
+                    <i class="fa-solid fa-users-slash kpi-icon"></i>
+                    <div class="kpi-title">Docentes Infractores</div>
+                    <div class="kpi-value" id="kpiDocentes">0</div>
+                </div>
             </div>
-            <div class="filter-group">
-                <label>Sistema Académico</label>
-                <select id="fMod" onchange="filtrarGlobal()">
-                    <option value="Todas">Ambos Sistemas</option>
-                    <option value="PRESENCIAL / SEMANAL">Sistema Presencial</option>
-                    <option value="SEMIPRESENCIAL">Sistema Semipresencial</option>
-                </select>
+
+            <!-- SECCIÓN DE GRÁFICOS -->
+            <div id="seccionGraficos" class="charts-dashboard">
+                <div class="card-panel">
+                    <div class="section-title"><i class="fa-solid fa-ranking-star"></i> Top 10 Infractores</div>
+                    <div class="chart-wrapper">
+                        <canvas id="chartTop"></canvas>
+                    </div>
+                </div>
+                <div class="card-panel">
+                    <div class="section-title"><i class="fa-solid fa-users-viewfinder"></i> Faltas por Sistema</div>
+                    <div class="chart-wrapper">
+                        <canvas id="chartSistemas"></canvas>
+                    </div>
+                </div>
+                <div class="card-panel">
+                    <div class="section-title"><i class="fa-regular fa-moon"></i> Faltas por Turno</div>
+                    <div class="chart-wrapper">
+                        <canvas id="chartTurnos"></canvas>
+                    </div>
+                </div>
             </div>
-            <div class="filter-group" style="min-width: auto; flex: 0 0 auto;">
-                <button id="btnToggle" class="btn-toggle" onclick="toggleGraficos()">
-                    <i class="fa-solid fa-eye-slash"></i> Ocultar Gráficos
-                </button>
+
+            <!-- Tabla de Datos -->
+            <div class="card-panel">
+                <div class="section-title"><i class="fa-solid fa-table-list" style="color: var(--primary);"></i> Base de Datos Detallada de Infracciones</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="30%">Nombre del Docente</th>
+                                <th width="35%">Materia y Periodo</th>
+                                <th width="15%">Sistema / Turno</th>
+                                <th width="10%" style="text-align: center;">Incidencias</th>
+                                <th width="10%" style="text-align: center;">Tiempo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoTabla"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- KPIs -->
-        <div class="kpi-row">
-            <div class="kpi-card danger">
-                <i class="fa-solid fa-clock kpi-icon"></i>
-                <div class="kpi-title">Tiempo Total Perdido</div>
-                <div class="kpi-value" id="kpiHoras">0h 0m</div>
-            </div>
-            <div class="kpi-card warning">
-                <i class="fa-solid fa-triangle-exclamation kpi-icon"></i>
-                <div class="kpi-title">Total de Faltas/Atrasos</div>
-                <div class="kpi-value" id="kpiFrecuencia">0</div>
-            </div>
-            <div class="kpi-card">
-                <i class="fa-solid fa-users-slash kpi-icon"></i>
-                <div class="kpi-title">Docentes</div>
-                <div class="kpi-value" id="kpiDocentes">0</div>
-            </div>
-        </div>
-
-        <!-- SECCIÓN DE GRÁFICOS INTERACTIVOS -->
-        <div id="seccionGraficos" class="charts-dashboard">
-            <div class="card-panel">
-                <div class="section-title"><i class="fa-solid fa-ranking-star"></i> Top 10 Infractores</div>
-                <div class="chart-wrapper">
-                    <canvas id="chartTop"></canvas>
+        <!-- ============================================== -->
+        <!-- PESTAÑA 2: POWER BI -->
+        <!-- ============================================== -->
+        <div id="tab-powerbi" class="tab-content">
+            <div class="card-panel" style="padding: 10px;">
+                <div class="section-title" style="padding-left: 10px; padding-top: 10px;">
+                    <i class="fa-solid fa-chart-pie" style="color: var(--accent);"></i> 
+                    Indicadores Docencia Universitaria
                 </div>
-            </div>
-            <div class="card-panel">
-                <div class="section-title"><i class="fa-solid fa-users-viewfinder"></i> Faltas por Sistema</div>
-                <div class="chart-wrapper">
-                    <canvas id="chartSistemas"></canvas>
+                <div class="pbi-container">
+                    
+                    <!-- ============================================== -->
+                    <!-- AQUÍ ESTÁ TU ENLACE DE POWER BI INSERTADO      -->
+                    <!-- ============================================== -->
+                    <iframe src="https://app.powerbi.com/reportEmbed?reportId=800dcaf2-f11d-432d-b2c4-5774e762edbf&autoAuth=true&ctid=cf263038-f11c-49d2-9183-556a34b747e2&actionBarEnabled=true" frameborder="0" allowFullScreen="true" id="miPowerBI"></iframe>
+                    
+                    <div class="pbi-placeholder" id="pbiPlaceholder">
+                        <i class="fa-solid fa-chart-pie" style="font-size:40px; margin-bottom:10px; color: var(--primary);"></i>
+                        <h3>Power BI no vinculado</h3>
+                        <p>Pega tu enlace de Power BI en el atributo <strong>src="..."</strong> del código HTML.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="card-panel">
-                <div class="section-title"><i class="fa-regular fa-moon"></i> Faltas por Turno</div>
-                <div class="chart-wrapper">
-                    <canvas id="chartTurnos"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tabla de Datos -->
-        <div class="card-panel">
-            <div class="section-title"><i class="fa-solid fa-table-list" style="color: var(--primary);"></i> Base de Datos Detallada de Infracciones</div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th width="30%">Nombre del Docente</th>
-                            <th width="35%">Materia y Periodo</th>
-                            <th width="15%">Sistema / Turno</th>
-                            <th width="10%" style="text-align: center;">Incidencias</th>
-                            <th width="10%" style="text-align: center;">Tiempo</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cuerpoTabla"></tbody>
-                </table>
             </div>
         </div>
 
@@ -185,6 +234,14 @@
 
     <!-- SCRIPT DE LÓGICA Y GRÁFICOS -->
     <script>
+        // Funcionalidad de Pestañas
+        function abrirPestana(idPestana, elemento) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(idPestana).classList.add('active');
+            elemento.classList.add('active');
+        }
+
         // Funcionalidad: Ocultar/Mostrar Gráficos
         function toggleGraficos() {
             const seccion = document.getElementById('seccionGraficos');
@@ -201,6 +258,12 @@
             }
         }
 
+        // Ocultar placeholder si se insertó el link de Power BI
+        const iframePBI = document.getElementById('miPowerBI');
+        if(iframePBI.getAttribute('src') !== "" && iframePBI.getAttribute('src') !== "PEGA_AQUÍ_TU_ENLACE_DE_POWER_BI") {
+            document.getElementById('pbiPlaceholder').style.display = 'none';
+        }
+
         let datosDocentes = [];
         let chartTop, chartSist, chartTurno;
 
@@ -214,7 +277,7 @@
                     <tr><td colspan="5" class="empty-state">
                         <i class="fa-solid fa-triangle-exclamation" style="font-size: 30px; color: var(--warning); margin-bottom: 10px;"></i><br>
                         <strong>No se pudo cargar la base de datos (datos_dashboard.json)</strong><br>
-                        Asegúrese de abrir este HTML mediante un servidor local (Live Server o Firefox).
+                        Asegúrese de abrir este HTML mediante un servidor local (Live Server).
                     </td></tr>`;
             }
         }
