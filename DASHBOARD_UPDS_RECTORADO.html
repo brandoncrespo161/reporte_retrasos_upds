@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoría Académica | UPDS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root { 
+            --primary: #314284; --secondary: #1f3189; --accent: #249cdd; 
+            --success: #4c874d; --danger: #c21226; --warning: #f59e0b; 
+            --bg-color: #f4f7f6; --card-bg: #ffffff; --border: #e2e8f0; 
+            --text-dark: #1e293b; --text-muted: #64748b;
+        } 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Open Sans', sans-serif; background-color: var(--bg-color); color: var(--text-dark); display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Cabecera */
+        .header { background: var(--primary); color: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .header h1 { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800; }
+        .header-badge { background: rgba(255, 255, 255, 0.15); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid rgba(255,255,255,0.3); }
+        
+        .container { max-width: 1450px; margin: 20px auto; padding: 0 15px; width: 100%; display: flex; flex-direction: column; gap: 15px; animation: fadeIn 0.4s ease-out;}
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Componentes Base */
+        .card-panel { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .section-title { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 800; color: var(--primary); margin-bottom: 15px; display:flex; align-items:center; gap:8px; border-bottom: 1px solid var(--border); padding-bottom: 8px;}
+
+        /* Filtros */
+        .filters { display: flex; gap: 15px; background: #ffffff; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.02); flex-wrap: wrap; align-items: flex-end;}
+        .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 180px; }
+        .filter-group label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
+        .filter-group select, .filter-group input { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 12px; color: var(--text-dark); outline: none; transition: 0.2s; background: #f8fafc; height: 36px;}
+        .filter-group select:focus, .filter-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(49,66,132,0.1); background: #ffffff;}
+        
+        .btn-toggle { height: 36px; padding: 0 20px; border-radius: 6px; border: none; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; background: var(--secondary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap;}
+        .btn-toggle:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* KPIs Superiores */
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .kpi-card { background: var(--card-bg); padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); box-shadow: 0 2px 4px rgba(0,0,0,0.04); position: relative; overflow: hidden;}
+        .kpi-card.danger { border-left-color: var(--danger); background: linear-gradient(90deg, #ffffff 0%, #fffafa 100%); }
+        .kpi-card.warning { border-left-color: var(--warning); background: linear-gradient(90deg, #ffffff 0%, #fffdf8 100%);}
+        .kpi-icon { position: absolute; right: -5px; bottom: -10px; font-size: 60px; opacity: 0.04; color: var(--text-dark);}
+        .kpi-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px; position: relative; z-index: 2;}
+        .kpi-value { font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 800; color: var(--text-dark); position: relative; z-index: 2;}
+        .kpi-card.danger .kpi-value { color: var(--danger); }
+
+        /* Gráficos */
+        .charts-dashboard { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 15px; transition: all 0.3s ease-in-out; }
+        .chart-wrapper { position: relative; width: 100%; height: 240px; }
+
+        /* Tabla */
+        .table-responsive { overflow-y: auto; max-height: 500px; border-radius: 6px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        thead { background: var(--primary); color: white; font-family: 'Montserrat', sans-serif; position: sticky; top: 0; z-index: 10;}
+        th { padding: 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; white-space: nowrap;}
+        td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: middle; }
+        tr:hover td { background-color: #f8fafc; }
+        .badge { padding: 3px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; display: inline-block; text-transform: uppercase; }
+        .badge-pres { background: rgba(36, 156, 221, 0.1); color: var(--accent); border: 1px solid rgba(36, 156, 221, 0.3); }
+        .badge-semi { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .retraso-celda { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 800; text-align: center; }
+        .retraso-critico { color: var(--danger); }
+        .retraso-medio { color: var(--warning); }
+        .sub-text { font-size: 10px; color: var(--text-muted); display: block; margin-top: 2px; font-weight: 600; }
+        .empty-state { text-align: center; padding: 30px; color: var(--text-muted); font-size: 13px; }
+
+        @media (max-width: 1024px) {
+            .charts-dashboard { grid-template-columns: 1fr; }
+            .chart-wrapper { height: 280px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- CABECERA EJECUTIVA -->
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="logo_upds.png" alt="UPDS" style="height: 38px; background: white; border-radius: 4px; padding: 2px;" onerror="this.style.display='none'">
+            <div>
+                <h1 style="margin:0;"> Auditoría de Asistencia Docente</h1>
+                <div style="font-size: 11px; font-weight: 400; opacity: 0.9; margin-top: 2px;">Universidad Privada Domingo Savio - Sede Cochabamba</div>
+            </div>
+        </div>
+        <div class="header-badge"><i class="fa-solid fa-lock"></i> Informe General</div>
+    </div>
+    
+    <div class="container">
+        
+        <!-- BARRA DE FILTROS + BOTÓN OCULTAR GRÁFICOS -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>Buscar Docente / Materia</label>
+                <input type="text" id="fTexto" placeholder="Ej. Perez..." oninput="filtrarGlobal()">
+            </div>
+            <div class="filter-group">
+                <label>Módulo / Mes</label>
+                <select id="fMes" onchange="filtrarGlobal()">
+                    <option value="Todos">Todos (Ene - Mar)</option>
+                    <option value="Enero">Enero (Módulo 6-II-2026)</option>
+                    <option value="Febrero">Febrero (Módulo 1-I-2026)</option>
+                    <option value="Marzo">Marzo (Módulo 2-I-2026)</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Sistema Académico</label>
+                <select id="fMod" onchange="filtrarGlobal()">
+                    <option value="Todas">Ambos Sistemas</option>
+                    <option value="PRESENCIAL / SEMANAL">Sistema Presencial</option>
+                    <option value="SEMIPRESENCIAL">Sistema Semipresencial</option>
+                </select>
+            </div>
+            <div class="filter-group" style="min-width: auto; flex: 0 0 auto;">
+                <button id="btnToggle" class="btn-toggle" onclick="toggleGraficos()">
+                    <i class="fa-solid fa-eye-slash"></i> Ocultar Gráficos
+                </button>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-row">
+            <div class="kpi-card danger">
+                <i class="fa-solid fa-clock kpi-icon"></i>
+                <div class="kpi-title">Tiempo Total Perdido</div>
+                <div class="kpi-value" id="kpiHoras">0h 0m</div>
+            </div>
+            <div class="kpi-card warning">
+                <i class="fa-solid fa-triangle-exclamation kpi-icon"></i>
+                <div class="kpi-title">Total de Faltas/Atrasos</div>
+                <div class="kpi-value" id="kpiFrecuencia">0</div>
+            </div>
+            <div class="kpi-card">
+                <i class="fa-solid fa-users-slash kpi-icon"></i>
+                <div class="kpi-title">Docentes</div>
+                <div class="kpi-value" id="kpiDocentes">0</div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE GRÁFICOS INTERACTIVOS -->
+        <div id="seccionGraficos" class="charts-dashboard">
+            <div class="card-panel">
+                <div class="section-title"><i class="fa-solid fa-ranking-star"></i> Top 10 Infractores</div>
+                <div class="chart-wrapper">
+                    <canvas id="chartTop"></canvas>
+                </div>
+            </div>
+            <div class="card-panel">
+                <div class="section-title"><i class="fa-solid fa-users-viewfinder"></i> Faltas por Sistema</div>
+                <div class="chart-wrapper">
+                    <canvas id="chartSistemas"></canvas>
+                </div>
+            </div>
+            <div class="card-panel">
+                <div class="section-title"><i class="fa-regular fa-moon"></i> Faltas por Turno</div>
+                <div class="chart-wrapper">
+                    <canvas id="chartTurnos"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Datos -->
+        <div class="card-panel">
+            <div class="section-title"><i class="fa-solid fa-table-list" style="color: var(--primary);"></i> Base de Datos Detallada de Infracciones</div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="30%">Nombre del Docente</th>
+                            <th width="35%">Materia y Periodo</th>
+                            <th width="15%">Sistema / Turno</th>
+                            <th width="10%" style="text-align: center;">Incidencias</th>
+                            <th width="10%" style="text-align: center;">Tiempo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTabla"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE LÓGICA Y GRÁFICOS -->
+    <script>
+        // Funcionalidad: Ocultar/Mostrar Gráficos
+        function toggleGraficos() {
+            const seccion = document.getElementById('seccionGraficos');
+            const btn = document.getElementById('btnToggle');
+            
+            if (seccion.style.display === 'none') {
+                seccion.style.display = 'grid';
+                btn.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ocultar Gráficos';
+                btn.style.background = 'var(--secondary)';
+            } else {
+                seccion.style.display = 'none';
+                btn.innerHTML = '<i class="fa-solid fa-eye"></i> Mostrar Gráficos';
+                btn.style.background = 'var(--accent)';
+            }
+        }
+
+        let datosDocentes = [];
+        let chartTop, chartSist, chartTurno;
+
+        async function cargarDatos() {
+            try {
+                const respuesta = await fetch('datos_dashboard.json');
+                datosDocentes = await respuesta.json();
+                filtrarGlobal();
+            } catch (error) {
+                document.getElementById('cuerpoTabla').innerHTML = `
+                    <tr><td colspan="5" class="empty-state">
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 30px; color: var(--warning); margin-bottom: 10px;"></i><br>
+                        <strong>No se pudo cargar la base de datos (datos_dashboard.json)</strong><br>
+                        Asegúrese de abrir este HTML mediante un servidor local (Live Server o Firefox).
+                    </td></tr>`;
+            }
+        }
+
+        function filtrarGlobal() {
+            const fTexto = document.getElementById('fTexto').value.toLowerCase();
+            const fMes = document.getElementById('fMes').value;
+            const fMod = document.getElementById('fMod').value;
+            
+            const filtrados = datosDocentes.filter(d => {
+                const materiaVal = d.Materia ? d.Materia.toLowerCase() : '';
+                const matchTexto = d.Docente.toLowerCase().includes(fTexto) || materiaVal.includes(fTexto);
+                const matchMes = fMes === 'Todos' ? true : d.Mes === fMes;
+                const matchMod = fMod === 'Todas' ? true : d.Modalidad.toUpperCase() === fMod;
+                return matchTexto && matchMes && matchMod;
+            });
+
+            actualizarVista(filtrados);
+        }
+
+        function actualizarVista(datos) {
+            const tbody = document.getElementById('cuerpoTabla');
+            let html = '';
+            let totalMins = 0, totalFrec = 0;
+            let docentesSet = new Set();
+            let dataTop = {};
+            let dataSist = { 'Presencial': 0, 'Semipresencial': 0 };
+            let dataTurnos = { 'MAÑANA': 0, 'MEDIO DIA': 0, 'TARDE': 0, 'NOCHE': 0 };
+
+            datos.forEach(d => {
+                totalMins += d.Minutos_Totales;
+                totalFrec += d.Faltas;
+                docentesSet.add(d.Docente);
+
+                if(!dataTop[d.Docente]) dataTop[d.Docente] = 0;
+                dataTop[d.Docente] += d.Minutos_Totales;
+
+                if(d.Modalidad.toUpperCase() === 'SEMIPRESENCIAL') dataSist['Semipresencial'] += d.Faltas;
+                else dataSist['Presencial'] += d.Faltas;
+
+                if(dataTurnos[d.Turno] !== undefined) dataTurnos[d.Turno] += d.Faltas;
+                else dataTurnos[d.Turno] = d.Faltas;
+
+                let claseRetraso = d.Minutos_Totales > 60 ? 'retraso-critico' : (d.Minutos_Totales > 30 ? 'retraso-medio' : '');
+                const badgeClass = d.Modalidad.toUpperCase() === 'SEMIPRESENCIAL' ? 'badge-semi' : 'badge-pres';
+
+                html += `
+                    <tr>
+                        <td><strong>${d.Docente}</strong></td>
+                        <td><div style="font-weight: 700; color: var(--primary);">${d.Materia}</div><span class="sub-text">Módulo: ${d.Modulo} (${d.Mes})</span></td>
+                        <td><span class="badge ${badgeClass}">${d.Modalidad}</span><br><span class="sub-text">${d.Turno}</span></td>
+                        <td style="text-align: center; font-weight: 700;">${d.Faltas}</td>
+                        <td class="retraso-celda ${claseRetraso}">${d.Tiempo_Formateado}</td>
+                    </tr>`;
+            });
+
+            tbody.innerHTML = html || '<tr><td colspan="5" class="empty-state">No hay registros para la búsqueda.</td></tr>';
+            
+            document.getElementById('kpiHoras').innerText = `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
+            document.getElementById('kpiFrecuencia').innerText = totalFrec;
+            document.getElementById('kpiDocentes').innerText = docentesSet.size;
+
+            dibujarGraficos(dataTop, dataSist, dataTurnos);
+        }
+
+        function dibujarGraficos(dataTop, dataSist, dataTurnos) {
+            if(chartTop) chartTop.destroy();
+            if(chartSist) chartSist.destroy();
+            if(chartTurno) chartTurno.destroy();
+
+            Chart.defaults.font.family = "'Open Sans', sans-serif";
+            Chart.defaults.color = '#64748b';
+            Chart.defaults.font.size = 10; 
+
+            let arrTop = Object.entries(dataTop).map(([n, m]) => ({n, m})).sort((a,b) => b.m - a.m).slice(0, 10);
+            
+            chartTop = new Chart(document.getElementById('chartTop'), {
+                type: 'bar',
+                data: {
+                    labels: arrTop.map(d => d.n.substring(0,18) + '...'),
+                    datasets: [{ label: 'Minutos', data: arrTop.map(d => d.m), backgroundColor: '#c21226', borderRadius: 3 }]
+                },
+                options: { 
+                    indexAxis: 'y', 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
+                }
+            });
+
+            chartSist = new Chart(document.getElementById('chartSistemas'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Presencial', 'Semipresencial'],
+                    datasets: [{ data: [dataSist.Presencial, dataSist.Semipresencial], backgroundColor: ['#314284', '#f59e0b'], borderWidth: 0 }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    cutout: '70%',
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
+                }
+            });
+
+            chartTurno = new Chart(document.getElementById('chartTurnos'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(dataTurnos),
+                    datasets: [{ label: 'Faltas', data: Object.values(dataTurnos), backgroundColor: '#249cdd', borderRadius: 3 }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
+                }
+            });
+        }
+
+        window.onload = cargarDatos;
+    </script>
+</body>
+</html>
